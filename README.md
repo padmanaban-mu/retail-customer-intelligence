@@ -1,43 +1,39 @@
-# Retail Customer Intelligence — Prediction & Segmentation
+# Retail Customer Intelligence
 
-An end-to-end data science project that analyses online retail transactions to explore customer behaviour, predict future spend categories, segment customers, and discover product associations.
+This project uses the UCI Online Retail transaction dataset to explore customer behaviour. It brings together customer classification, segmentation, market basket analysis, PCA, and Self-Organizing Maps in a Streamlit application.
 
-The project combines data preparation, supervised learning, unsupervised learning, association-rule mining, dimensionality reduction, and an interactive Streamlit application.
+The work is split into separate analysis modules so the data preparation and modelling steps can be inspected independently.
 
-## Analytical modules
+## What the project explores
 
-- **Dataset profiling and cleaning:** inspect transaction records, handle cancellations and missing customer identifiers, and prepare analysis-ready data.
-- **Customer behaviour prediction:** compare Decision Tree, Naive Bayes, and Support Vector Machine models.
-- **Model diagnostics:** evaluate classification performance with metrics and confusion matrices.
-- **Customer segmentation:** use K-Means and K-Medoids clustering, with Elbow and Silhouette analysis to compare cluster configurations.
-- **Market basket analysis:** apply Apriori to discover item associations using support, confidence, and lift.
-- **Dimensionality reduction:** use PCA to project high-dimensional customer features.
-- **Self-Organizing Maps:** use a Kohonen SOM and visualisations such as the U-Matrix to inspect topological structure.
+- **Classification:** compare Decision Tree, Naive Bayes, and SVM models for predicting customer spend categories.
+- **Customer segmentation:** apply K-Means and K-Medoids to group customers using RFM and behavioural features.
+- **Market basket analysis:** use Apriori to find product associations, evaluated with support, confidence, and lift.
+- **PCA:** reduce the feature space to two dimensions for visual inspection.
+- **Self-Organizing Maps:** use a Kohonen map and U-Matrix to explore the structure of customer data.
+- **Streamlit interface:** bring the analysis and visualisations together in an interactive application.
 
 ## Dataset
 
-The project uses the UCI Online Retail dataset (Dataset ID 352), containing transactions from a UK-based online retailer from December 2010 to December 2011.
+The source is the [UCI Online Retail dataset](https://archive.ics.uci.edu/dataset/352/online+retail), which contains transactions from a UK-based online retailer between December 2010 and December 2011.
 
-The source data includes invoice, product, quantity, date, unit-price, customer, and country fields. The repository stores the source spreadsheet and a Parquet cache under `retail_customer_intelligence/data/`.
+The records include invoice, product, quantity, date, unit price, customer, and country fields. The project keeps the spreadsheet and a Parquet cache under `retail_customer_intelligence/data/`.
 
-## Methodology and leakage prevention
+## How the time split works
 
-The feature-engineering pipeline uses a temporal cutoff of **2011-09-01**:
+The feature pipeline uses **2011-09-01** as a temporal cutoff:
 
-- Transactions before the cutoff are used to compute customer features such as Recency, Frequency, Monetary value, and behavioural indicators.
-- Transactions after the cutoff define the future spend target.
-- Preprocessing bounds and scaling are fitted on training data and then applied to held-out data.
+- Transactions before the cutoff are used to calculate historical customer features, including Recency, Frequency, and Monetary value.
+- Transactions after the cutoff are used to define the future spend target.
+- Preprocessing steps such as scaling are fitted on the training data before being applied to held-out data.
 
-This time-based separation is important: using future transactions to construct historical features would leak target information into the model.
+This separation matters because using future transactions to calculate past customer features would leak information into the model. The detailed choices are documented in `SPEC.md`.
 
-Heavy-tailed numeric features are clipped using empirical percentile bounds and transformed with `log1p` where appropriate. Consult `SPEC.md` for the detailed technical specification.
+## Tools used
 
-## Technology
-
-- Python
-- pandas and NumPy
+- Python, pandas, NumPy
 - scikit-learn and scikit-learn-extra
-- mlxtend
+- mlxtend (Apriori)
 - MiniSom
 - Streamlit
 - Matplotlib and Seaborn
@@ -69,9 +65,7 @@ Heavy-tailed numeric features are clipped using empirical percentile bounds and 
 
 ## Run locally
 
-### Requirements
-
-Python 3.10 or 3.11 is recommended. Git is also required.
+Python 3.10 or 3.11 is recommended.
 
 ```bash
 git clone https://github.com/padmanaban-mu/retail-customer-intelligence.git
@@ -85,11 +79,11 @@ Activate the environment:
 # Windows PowerShell
 .venv\Scripts\Activate.ps1
 
-# macOS/Linux
+# macOS / Linux
 source .venv/bin/activate
 ```
 
-Install dependencies and launch the app:
+Install the packages and start Streamlit:
 
 ```bash
 python -m pip install --upgrade pip
@@ -97,22 +91,22 @@ pip install -r requirements.txt
 streamlit run app.py
 ```
 
-Open the local Streamlit URL printed in the terminal (normally http://localhost:8501).
+Open the local URL printed in the terminal (usually [http://localhost:8501](http://localhost:8501)).
 
 ## Verification
 
-Run the project's verification suite from the application directory:
+Run the verification script from the application directory:
 
 ```bash
 python verify_all.py
 ```
 
-Individual phase tests are also provided for preprocessing, feature engineering, classification, clustering, association analysis, PCA, and SOM.
+The repository also contains phase-specific tests for data preparation, feature engineering, classification, clustering, association analysis, PCA, and SOM.
 
-## Reproducibility notes
+## Interpreting the results
 
-The dataset is historical and reflects the source retailer and collection period; it should not be interpreted as current market behaviour. Model results depend on the selected time split, preprocessing, feature definitions, and random seeds. Re-run the verification scripts when changing the pipeline.
+This dataset describes a particular retailer and a historical period; it is not a representation of current retail behaviour. Results depend on the selected time split, feature construction, preprocessing, and model settings. Re-run the verification scripts when changing the pipeline.
 
-## License
+## License and dataset
 
-No license file was identified during this documentation update. Check licensing and the dataset's terms before redistribution.
+Check the repository's license and the UCI dataset terms before redistributing the code or source data.
